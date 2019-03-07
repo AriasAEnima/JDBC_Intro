@@ -119,11 +119,11 @@ public class JDBCExample {
      */
     public static int valorTotalPedido(Connection con, int codigoPedido) throws SQLException{
         int ans=0;       
-        String qry="SELECT pro.precio FROM ORD_PRODUCTOS as pro, ORD_DETALLES_PEDIDO as de "
+        String qry="SELECT pro.precio,de.cantidad FROM ORD_PRODUCTOS as pro, ORD_DETALLES_PEDIDO as de "
                 + "WHERE de.pedido_fk="+codigoPedido+" AND de.producto_fk=pro.codigo";
         ResultSet rs=con.createStatement().executeQuery(qry);
         while (rs.next()){
-            ans+=rs.getInt(1);
+            ans+=rs.getInt(1)*rs.getInt(2);
         }
         return ans;
     }
