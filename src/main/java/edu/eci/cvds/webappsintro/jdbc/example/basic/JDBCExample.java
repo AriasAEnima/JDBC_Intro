@@ -34,10 +34,10 @@ public class JDBCExample {
     
     public static void main(String args[]){
         try {
-            String url="jdbc:mysql://HOST:3306/BD";
+            String url="jdbc:mysql://desarrollo.is.escuelaing.edu.co:3306/bdprueba";
             String driver="com.mysql.jdbc.Driver";
-            String user="USER";
-            String pwd="PWD";
+            String user="bdprueba";
+            String pwd="bdprueba";
                         
             Class.forName(driver);
             Connection con=DriverManager.getConnection(url,user,pwd);
@@ -57,8 +57,8 @@ public class JDBCExample {
             System.out.println("-----------------------");
             
             
-            int suCodigoECI=20134423;
-            registrarNuevoProducto(con, suCodigoECI, "SU NOMBRE", 99999999);            
+            int suCodigoECI=2109117;
+            registrarNuevoProducto(con, suCodigoECI, "J. Eduardo Arias", 888888);            
             con.commit();
                         
             
@@ -80,11 +80,13 @@ public class JDBCExample {
      * @throws SQLException 
      */
     public static void registrarNuevoProducto(Connection con, int codigo, String nombre,int precio) throws SQLException{
-        //Crear preparedStatement
-        //Asignar parámetros
-        //usar 'execute'
-
-        
+       
+        String qry="INSERT INTO ORD_PRODUCTOS VALUES (?,?,?)";
+        PreparedStatement ps=con.prepareStatement(qry);
+        ps.setInt(1, codigo);
+        ps.setString(2, nombre);
+        ps.setInt(3, precio);
+        ps.executeUpdate();          
         con.commit();
         
     }
@@ -95,14 +97,15 @@ public class JDBCExample {
      * @param codigoPedido el código del pedido
      * @return 
      */
-    public static List<String> nombresProductosPedido(Connection con, int codigoPedido){
+    public static List<String> nombresProductosPedido(Connection con, int codigoPedido) throws SQLException{
         List<String> np=new LinkedList<>();
         
-        //Crear prepared statement
-        //asignar parámetros
-        //usar executeQuery
-        //Sacar resultados del ResultSet
-        //Llenar la lista y retornarla
+       String qry="SELECT pro.nombre FROM ORD_PRODUCTOS as pro, ORD_DETALLES_PEDIDO as de "
+                + "WHERE de.pedido_fk="+codigoPedido+" AND de.producto_fk=pro.codigo";
+        ResultSet rs=con.createStatement().executeQuery(qry);    
+        while (rs.next()){
+            np.add(rs.getString(1));
+        }
         
         return np;
     }
@@ -114,14 +117,15 @@ public class JDBCExample {
      * @param codigoPedido código del pedido cuyo total se calculará
      * @return el costo total del pedido (suma de: cantidades*precios)
      */
-    public static int valorTotalPedido(Connection con, int codigoPedido){
-        
-        //Crear prepared statement
-        //asignar parámetros
-        //usar executeQuery
-        //Sacar resultado del ResultSet
-        
-        return 0;
+    public static int valorTotalPedido(Connection con, int codigoPedido) throws SQLException{
+        int ans=0;       
+        String qry="SELECT pro.precio FROM ORD_PRODUCTOS as pro, ORD_DETALLES_PEDIDO as de "
+                + "WHERE de.pedido_fk="+codigoPedido+" AND de.producto_fk=pro.codigo";
+        ResultSet rs=con.createStatement().executeQuery(qry);
+        while (rs.next()){
+            ans+=rs.getInt(1);
+        }
+        return ans;
     }
     
 
